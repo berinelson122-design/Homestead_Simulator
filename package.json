@@ -1,0 +1,35 @@
+{
+  "name": "project-homestead-sim",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "ship-vercel": "vercel --prod",
+    "ship-cloudflare": "npm run build && npx wrangler pages deploy dist",
+    "ship-all": "npm run ship-vercel && npm run ship-cloudflare"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.0.2",
+    "three": "^0.170.0",
+    "@types/three": "^0.170.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.13.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "terser": "^5.37.0",
+    "typescript": "~5.7.3",
+    "vite": "^6.1.0"
+  }
+}
