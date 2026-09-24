@@ -17,6 +17,9 @@ const defaultCommands: Record<CommandNode, boolean> = {
   ACTION: false,
   BOMB: false,
   FOCUS: false,
+  WEATHER_CYCLE: false,
+  CAPTURE_SNAPSHOT: false,
+  TIMELAPSE_TOGGLE: false,
 };
 
 export const useInputStore = create<InputState>((set) => ({

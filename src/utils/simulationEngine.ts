@@ -1,6 +1,7 @@
-import { PlacedStructure, HomesteadMetrics, StressTestResult } from '../types';
+import { PlacedStructure, HomesteadMetrics, StressTestResult, WeatherType } from '../types';
+import { formatDec } from './math';
 
-export const STRUCTURE-SPECS = {
+export const STRUCTURE_SPECS = {
   'CABIN': { powerGen: 0, powerStorage: 0, powerDraw: 8, waterGen: 0, waterStorage: 0, waterDraw: 40, calories: 0, methane: 0, fertilizer: 0, biochar: 0, cost: 5000 },
   'SOLAR-ARRAY': { powerGen: 15, powerStorage: 0, powerDraw: 0, waterGen: 0, waterStorage: 0, waterDraw: 0, calories: 0, methane: 0, fertilizer: 0, biochar: 0, cost: 1200 },
   'BATTERY-BANK': { powerGen: 0, powerStorage: 15, powerDraw: 0.5, waterGen: 0, waterStorage: 0, waterDraw: 0, calories: 0, methane: 0, fertilizer: 0, biochar: 0, cost: 2000 },
@@ -13,7 +14,10 @@ export const STRUCTURE-SPECS = {
   'BIOCHAR-RETORT': { powerGen: 0, powerStorage: 0, powerDraw: 0, waterGen: 0, waterStorage: 0, waterDraw: 0, calories: 0, methane: 0, fertilizer: 0, biochar: 12, cost: 600 },
 };
 
-export const calculateHomesteadMetrics = (structures: PlacedStructure[]): HomesteadMetrics => {
+export const calculateHomesteadMetrics = (
+  structures: PlacedStructure[],
+  weather: WeatherType = 'CLEAR'
+): HomesteadMetrics => {
   let powerGen = 0;
   let powerStorage = 0;
   let powerDraw = 0;
@@ -28,7 +32,7 @@ export const calculateHomesteadMetrics = (structures: PlacedStructure[]): Homest
   let biochar = 0;
 
   structures.forEach((s) => {
-    const spec = STRUCTURE-SPECS[s.type];
+    const spec = STRUCTURE_SPECS[s.type];
     if (!spec) return;
     powerGen += spec.powerGen;
     powerStorage += spec.powerStorage;
@@ -43,6 +47,20 @@ export const calculateHomesteadMetrics = (structures: PlacedStructure[]): Homest
     fertilizer += spec.fertilizer;
     biochar += spec.biochar;
   });
+
+  // Weather environmental impact modifiers
+  if (weather === 'RAIN') {
+    waterGen = Math.round(waterGen * 1.35); // Boost rainwater collection
+    powerGen = Math.round(powerGen * 0.7);  // Cloud cover reduces solar
+  } else if (weather === 'SNOW') {
+    powerGen = Math.round(powerGen * 0.5);  // Heavy snow blanket on solar panels
+    powerDraw += 4;                         // Habitat thermal heating demand
+    waterGen = Math.round(waterGen * 0.6);  // Frozen water piping
+  } else if (weather === 'ACID_STORM') {
+    powerGen = Math.round(powerGen * 0.65); // Atmospheric electromagnetic interference
+    powerDraw += 3;                         // Air scrubbers & ion filters active
+    methane += 0.8;                         // High pressure bacterial acceleration
+  }
 
   // Biochar boosts raised bed and greenhouse outputs by 25% if present
   if (biochar > 0) {

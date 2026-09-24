@@ -1,7 +1,9 @@
 import { create } from 'zustand';
-import { PlacedStructure, StructureType, HomesteadMetrics, StressTestResult } from '../types';
+import { PlacedStructure, StructureType, HomesteadMetrics, StressTestResult, WeatherType } from '../types';
 import { calculateHomesteadMetrics, runStressScenario } from '../utils/simulationEngine';
 import { audioSynth } from '../services/AudioSynth';
+import { useTimelapseStore } from './useTimelapseStore';
+import { useWeatherStore } from './useWeatherStore';
 
 interface HomesteadState {
   structures: PlacedStructure[];
@@ -16,6 +18,7 @@ interface HomesteadState {
   clearGrid: () => void;
   runTest: (scenario: 'GRID-DOWN' | 'DROUGHT' | 'FREEZE') => void;
   closeModal: () => void;
+  recomputeMetrics: () => void;
 }
 
 const initialStructures: PlacedStructure[] = [
@@ -32,9 +35,14 @@ const initialStructures: PlacedStructure[] = [
 export const useHomesteadStore = create<HomesteadState>((set, get) => ({
   structures: initialStructures,
   selectedTool: 'SOLAR-ARRAY',
-  metrics: calculateHomesteadMetrics(initialStructures),
+  metrics: calculateHomesteadMetrics(initialStructures, 'CLEAR'),
   stressResult: null,
   isModalOpen: false,
+
+  recomputeMetrics: () => {
+    const weather = useWeatherStore.getState().current;
+    set({ metrics: calculateHomesteadMetrics(get().structures, weather) });
+  },
 
   setSelectedTool: (selectedTool) => {
     audioSynth.init();
@@ -57,27 +65,44 @@ export const useHomesteadStore = create<HomesteadState>((set, get) => ({
     };
 
     const nextStructures = [...structures, newStructure];
+    const weather = useWeatherStore.getState().current;
     set({
       structures: nextStructures,
-      metrics: calculateHomesteadMetrics(nextStructures),
+      metrics: calculateHomesteadMetrics(nextStructures, weather),
     });
+
+    // Schedule snapshot frame after mesh renders
+    setTimeout(() => {
+      useTimelapseStore.getState().triggerManualCapture();
+    }, 180);
   },
 
   removeStructure: (id) => {
     audioSynth.playRemove();
     const nextStructures = get().structures.filter((s) => s.id !== id);
+    const weather = useWeatherStore.getState().current;
     set({
       structures: nextStructures,
-      metrics: calculateHomesteadMetrics(nextStructures),
+      metrics: calculateHomesteadMetrics(nextStructures, weather),
     });
+
+    // Schedule snapshot frame after mesh removal
+    setTimeout(() => {
+      useTimelapseStore.getState().triggerManualCapture();
+    }, 180);
   },
 
   clearGrid: () => {
     audioSynth.playRemove();
+    const weather = useWeatherStore.getState().current;
     set({
       structures: [],
-      metrics: calculateHomesteadMetrics([]),
+      metrics: calculateHomesteadMetrics([], weather),
     });
+
+    setTimeout(() => {
+      useTimelapseStore.getState().triggerManualCapture();
+    }, 180);
   },
 
   runTest: (scenario) => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHomesteadStore } from '../../store/useHomesteadStore';
-import { Zap, Droplets, Flame, Sparkles } from 'lucide-react';
+import { WeatherController } from './WeatherController';
+import { Zap, Droplets, Flame } from 'lucide-react';
 
 export const TelemetryPanel: React.FC = () => {
   const { metrics } = useHomesteadStore();
@@ -12,6 +13,9 @@ export const TelemetryPanel: React.FC = () => {
           REAL-TIME TELEMETRY
         </h2>
       </div>
+
+      {/* ATMOSPHERIC SIMULATOR DOCK */}
+      <WeatherController />
 
       {/* ELECTRICAL GRID */}
       <div className="border border-[#00F3FF]/40 p-3 bg-black flex flex-col gap-1">

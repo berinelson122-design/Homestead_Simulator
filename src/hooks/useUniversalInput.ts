@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useInputStore } from '../store/useInputStore';
+import { useWeatherStore } from '../store/useWeatherStore';
+import { useTimelapseStore } from '../store/useTimelapseStore';
 import { CommandNode } from '../types';
 
 export const useUniversalInput = () => {
@@ -7,6 +9,9 @@ export const useUniversalInput = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore when typing inside input elements
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+
       setDevice('PC');
       const keyMap: Record<string, CommandNode> = {
         ArrowUp: 'UP',
@@ -18,10 +23,25 @@ export const useUniversalInput = () => {
         ArrowRight: 'RIGHT',
         KeyD: 'RIGHT',
         Space: 'ACTION',
+        KeyC: 'WEATHER_CYCLE',
+        KeyX: 'CAPTURE_SNAPSHOT',
+        KeyT: 'TIMELAPSE_TOGGLE',
       };
 
       const cmd = keyMap[e.code];
-      if (cmd) setCommand(cmd, true);
+      if (cmd) {
+        setCommand(cmd, true);
+
+        // Immediate functional actions
+        if (cmd === 'WEATHER_CYCLE') {
+          useWeatherStore.getState().cycleNextWeather();
+        } else if (cmd === 'CAPTURE_SNAPSHOT') {
+          useTimelapseStore.getState().triggerManualCapture();
+        } else if (cmd === 'TIMELAPSE_TOGGLE') {
+          const isOpen = useTimelapseStore.getState().isViewerOpen;
+          useTimelapseStore.getState().setViewerOpen(!isOpen);
+        }
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -35,6 +55,9 @@ export const useUniversalInput = () => {
         ArrowRight: 'RIGHT',
         KeyD: 'RIGHT',
         Space: 'ACTION',
+        KeyC: 'WEATHER_CYCLE',
+        KeyX: 'CAPTURE_SNAPSHOT',
+        KeyT: 'TIMELAPSE_TOGGLE',
       };
       const cmd = keyMap[e.code];
       if (cmd) setCommand(cmd, false);

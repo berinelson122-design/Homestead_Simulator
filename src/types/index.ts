@@ -1,6 +1,40 @@
 export type DeviceType = 'PC' | 'MOBILE' | 'CONSOLE';
 
-export type CommandNode = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'ACTION' | 'BOMB' | 'FOCUS';
+export type CommandNode =
+  | 'UP'
+  | 'DOWN'
+  | 'LEFT'
+  | 'RIGHT'
+  | 'ACTION'
+  | 'BOMB'
+  | 'FOCUS'
+  | 'WEATHER_CYCLE'
+  | 'CAPTURE_SNAPSHOT'
+  | 'TIMELAPSE_TOGGLE';
+
+export type WeatherType = 'CLEAR' | 'RAIN' | 'SNOW' | 'ACID_STORM';
+
+export interface WeatherState {
+  current: WeatherType;
+  intensity: number; // 0.0 to 1.0
+  windSpeed: number; // km/h
+  temperatureC: number; // Celsius
+  autoCycle: boolean;
+  cycleIntervalSec: number;
+}
+
+export interface HomesteadSnapshot {
+  id: string;
+  timestamp: number;
+  dataUrl: string;
+  structureCount: number;
+  weather: WeatherType;
+  sustainabilityScore: number;
+  netPower: number;
+  netWater: number;
+  totalCalories: number;
+  note?: string;
+}
 
 export type StructureType =
   | 'CABIN'

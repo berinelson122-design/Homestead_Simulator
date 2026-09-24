@@ -1,0 +1,6 @@
+{
+  "name": "Homestead 3D Simulator",
+  "description": "3D homestead simulation engine with real-time telemetry, procedural controls, and interactive 3D viewport.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

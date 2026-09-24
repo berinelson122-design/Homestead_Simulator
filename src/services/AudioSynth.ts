@@ -49,6 +49,42 @@ export class AudioSynth {
     this.playTone(523.25, 'sine', 0.1);
     setTimeout(() => this.playTone(659.25, 'sine', 0.15), 100);
   }
+
+  public playWeatherChange(type: 'CLEAR' | 'RAIN' | 'SNOW' | 'ACID_STORM') {
+    this.init();
+    switch (type) {
+      case 'RAIN':
+        this.playTone(180, 'sine', 0.4, 90);
+        setTimeout(() => this.playTone(280, 'triangle', 0.25, 140), 80);
+        break;
+      case 'SNOW':
+        this.playTone(1200, 'sine', 0.35, 1400);
+        setTimeout(() => this.playTone(1800, 'triangle', 0.2, 1600), 70);
+        break;
+      case 'ACID_STORM':
+        this.playTone(90, 'sawtooth', 0.5, 45);
+        setTimeout(() => this.playTone(140, 'sawtooth', 0.3, 70), 100);
+        break;
+      case 'CLEAR':
+      default:
+        this.playTone(440, 'triangle', 0.15, 660);
+        setTimeout(() => this.playTone(660, 'sine', 0.25, 880), 90);
+        break;
+    }
+  }
+
+  public playCameraShutter() {
+    this.init();
+    this.playTone(1200, 'square', 0.04, 300);
+    setTimeout(() => {
+      this.playTone(400, 'sawtooth', 0.06, 150);
+    }, 45);
+  }
+
+  public playTimelapseStep() {
+    this.init();
+    this.playTone(950, 'triangle', 0.02);
+  }
 }
 
 export const audioSynth = new AudioSynth();
