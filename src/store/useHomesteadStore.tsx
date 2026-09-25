@@ -1,5 +1,13 @@
 import { create } from 'zustand';
-import { PlacedStructure, StructureType, HomesteadMetrics, StressTestResult, WeatherType } from '../types';
+import {
+  PlacedStructure,
+  StructureType,
+  HomesteadMetrics,
+  StressTestResult,
+  WeatherType,
+  TouchInteractionMode,
+  MobileActivePanel,
+} from '../types';
 import { calculateHomesteadMetrics, runStressScenario } from '../utils/simulationEngine';
 import { audioSynth } from '../services/AudioSynth';
 import { useTimelapseStore } from './useTimelapseStore';
@@ -11,10 +19,25 @@ interface HomesteadState {
   metrics: HomesteadMetrics;
   stressResult: StressTestResult | null;
   isModalOpen: boolean;
+  interactionMode: TouchInteractionMode;
+  mobilePanel: MobileActivePanel;
+  cameraResetCounter: number;
+  isBlueprintMode: boolean;
+  isEnergyOverlayMode: boolean;
+  isHelpModalOpen: boolean;
 
   setSelectedTool: (tool: StructureType) => void;
+  setInteractionMode: (mode: TouchInteractionMode) => void;
+  setMobilePanel: (panel: MobileActivePanel) => void;
+  toggleMobilePanel: (panel: MobileActivePanel) => void;
+  toggleBlueprintMode: () => void;
+  toggleEnergyOverlayMode: () => void;
+  setHelpModalOpen: (open: boolean) => void;
+  toggleHelpModal: () => void;
+  resetCamera: () => void;
   addStructure: (x: number, z: number) => void;
   removeStructure: (id: string) => void;
+  removeStructureAtGrid: (x: number, z: number) => void;
   clearGrid: () => void;
   runTest: (scenario: 'GRID-DOWN' | 'DROUGHT' | 'FREEZE') => void;
   closeModal: () => void;
@@ -38,16 +61,69 @@ export const useHomesteadStore = create<HomesteadState>((set, get) => ({
   metrics: calculateHomesteadMetrics(initialStructures, 'CLEAR'),
   stressResult: null,
   isModalOpen: false,
+  interactionMode: 'BUILD',
+  mobilePanel: 'NONE',
+  cameraResetCounter: 0,
+  isBlueprintMode: false,
+  isEnergyOverlayMode: false,
+  isHelpModalOpen: false,
 
   recomputeMetrics: () => {
     const weather = useWeatherStore.getState().current;
     set({ metrics: calculateHomesteadMetrics(get().structures, weather) });
   },
 
+  toggleBlueprintMode: () => {
+    const next = !get().isBlueprintMode;
+    audioSynth.playBlueprintToggle(next);
+    set({ isBlueprintMode: next });
+  },
+
+  toggleEnergyOverlayMode: () => {
+    const next = !get().isEnergyOverlayMode;
+    audioSynth.playEnergyOverlayToggle(next);
+    set({ isEnergyOverlayMode: next });
+  },
+
+  setHelpModalOpen: (open) => {
+    if (open) audioSynth.playIntelOpen();
+    else audioSynth.playSelect();
+    set({ isHelpModalOpen: open });
+  },
+
+  toggleHelpModal: () => {
+    const next = !get().isHelpModalOpen;
+    if (next) audioSynth.playIntelOpen();
+    else audioSynth.playSelect();
+    set({ isHelpModalOpen: next });
+  },
+
   setSelectedTool: (selectedTool) => {
     audioSynth.init();
     audioSynth.playSelect();
-    set({ selectedTool });
+    set({ selectedTool, interactionMode: 'BUILD' });
+  },
+
+  setInteractionMode: (interactionMode) => {
+    audioSynth.playSelect();
+    set({ interactionMode });
+  },
+
+  setMobilePanel: (mobilePanel) => {
+    audioSynth.playSelect();
+    set({ mobilePanel });
+  },
+
+  toggleMobilePanel: (panel) => {
+    audioSynth.playSelect();
+    set((state) => ({
+      mobilePanel: state.mobilePanel === panel ? 'NONE' : panel,
+    }));
+  },
+
+  resetCamera: () => {
+    audioSynth.playSelect();
+    set((state) => ({ cameraResetCounter: state.cameraResetCounter + 1 }));
   },
 
   addStructure: (x, z) => {
@@ -90,6 +166,13 @@ export const useHomesteadStore = create<HomesteadState>((set, get) => ({
     setTimeout(() => {
       useTimelapseStore.getState().triggerManualCapture();
     }, 180);
+  },
+
+  removeStructureAtGrid: (x, z) => {
+    const match = get().structures.find((s) => s.x === x && s.z === z);
+    if (match) {
+      get().removeStructure(match.id);
+    }
   },
 
   clearGrid: () => {

@@ -1,5 +1,9 @@
 export type DeviceType = 'PC' | 'MOBILE' | 'CONSOLE';
 
+export type TouchInteractionMode = 'BUILD' | 'DEMOLISH' | 'ORBIT';
+
+export type MobileActivePanel = 'NONE' | 'PALETTE' | 'TELEMETRY' | 'CONTROLS' | 'HELP' | 'LOGS';
+
 export type CommandNode =
   | 'UP'
   | 'DOWN'
@@ -10,9 +14,47 @@ export type CommandNode =
   | 'FOCUS'
   | 'WEATHER_CYCLE'
   | 'CAPTURE_SNAPSHOT'
-  | 'TIMELAPSE_TOGGLE';
+  | 'TIMELAPSE_TOGGLE'
+  | 'BLUEPRINT_TOGGLE'
+  | 'ENERGY_OVERLAY_TOGGLE'
+  | 'HELP_TOGGLE'
+  | 'SEASON_CYCLE'
+  | 'LOG_TOGGLE';
 
 export type WeatherType = 'CLEAR' | 'RAIN' | 'SNOW' | 'ACID_STORM';
+
+export type SeasonType = 'SPRING' | 'SUMMER' | 'AUTUMN' | 'WINTER';
+
+export interface SeasonalConfig {
+  season: SeasonType;
+  label: string;
+  temperatureModifier: number; // Celsius delta
+  solarEfficiencyMultiplier: number;
+  waterEvaporationMultiplier: number;
+  cropYieldMultiplier: number;
+  terrainColor: number;
+  gridColor: number;
+  ambientColor: number;
+  sunColor: number;
+  skyColor: number;
+  fogColor: number;
+  description: string;
+}
+
+export interface ResourceLogPoint {
+  minuteAgo: number; // 60 down to 0
+  timestamp: number;
+  powerGen: number;
+  powerDraw: number;
+  netPower: number;
+  waterGen: number;
+  waterDraw: number;
+  netWater: number;
+  calories: number;
+  methane: number;
+  fertilizer: number;
+  biochar: number;
+}
 
 export interface WeatherState {
   current: WeatherType;

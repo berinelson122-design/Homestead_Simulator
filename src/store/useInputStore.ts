@@ -20,6 +20,11 @@ const defaultCommands: Record<CommandNode, boolean> = {
   WEATHER_CYCLE: false,
   CAPTURE_SNAPSHOT: false,
   TIMELAPSE_TOGGLE: false,
+  BLUEPRINT_TOGGLE: false,
+  ENERGY_OVERLAY_TOGGLE: false,
+  HELP_TOGGLE: false,
+  SEASON_CYCLE: false,
+  LOG_TOGGLE: false,
 };
 
 export const useInputStore = create<InputState>((set) => ({

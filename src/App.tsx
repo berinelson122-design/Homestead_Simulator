@@ -8,6 +8,8 @@ import { Viewport3D } from './components/viewport/Viewport3D';
 import { TelemetryPanel } from './components/simulation/TelemetryPanel';
 import { StressTestModal } from './components/simulation/StressTestModal';
 import { TimelapseViewer } from './components/simulation/TimelapseViewer';
+import { ArchitectManualModal } from './components/simulation/ArchitectManualModal';
+import { ResourceLogPanel } from './components/simulation/ResourceLogPanel';
 import { ControlSettings } from './components/UI/ControlSettings';
 import { VirtualJoystick } from './components/UI/VirtualJoystick';
 
@@ -27,6 +29,8 @@ export const App: React.FC = () => {
 
       <StressTestModal />
       <TimelapseViewer />
+      <ArchitectManualModal />
+      <ResourceLogPanel />
       <VirtualJoystick />
       
       <div className="fixed bottom-4 left-4 z-40 hidden lg:block">

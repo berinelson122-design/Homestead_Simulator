@@ -85,6 +85,33 @@ export class AudioSynth {
     this.init();
     this.playTone(950, 'triangle', 0.02);
   }
+
+  public playBlueprintToggle(active: boolean) {
+    this.init();
+    if (active) {
+      this.playTone(600, 'square', 0.05, 1200);
+      setTimeout(() => this.playTone(1200, 'sine', 0.08, 1800), 40);
+    } else {
+      this.playTone(1400, 'sine', 0.06, 600);
+    }
+  }
+
+  public playEnergyOverlayToggle(active: boolean) {
+    this.init();
+    if (active) {
+      this.playTone(350, 'sawtooth', 0.06, 700);
+      setTimeout(() => this.playTone(700, 'triangle', 0.1, 1050), 50);
+    } else {
+      this.playTone(700, 'triangle', 0.08, 300);
+    }
+  }
+
+  public playIntelOpen() {
+    this.init();
+    this.playTone(500, 'sine', 0.06);
+    setTimeout(() => this.playTone(750, 'sine', 0.06), 50);
+    setTimeout(() => this.playTone(1000, 'triangle', 0.08), 100);
+  }
 }
 
 export const audioSynth = new AudioSynth();
